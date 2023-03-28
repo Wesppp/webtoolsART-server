@@ -20,14 +20,17 @@ const user = new Schema({
         type: String,
         required: true
     },
+    specialization: {
+        type: String,
+        required: false
+    },
     bio: {
         type: String,
         required: false
     },
     profileImage: {
-        type: String,
         required: false,
-        max: 255
+        type: String,
     },
     residence: {
         type: String,
@@ -50,6 +53,13 @@ const user = new Schema({
             ref: 'Article',
             required: false
         }
+    ],
+    favoritesArticles: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Article',
+            required: false
+        }
     ]
 }, {timestamps: true})
 
@@ -63,6 +73,21 @@ user.methods.removeArticle = function(id) {
 
     if (this.articles[idx]) {
         this.articles = this.articles.filter(articleId => articleId.toString() !== id.toString())
+    }
+
+    return this.save()
+}
+
+user.methods.addArticleToFavorites = function(id) {
+    this.favoritesArticles.push(id)
+    return this.save()
+}
+
+user.methods.removeArticleFromFavorites = function(id) {
+    const idx = this.favoritesArticles.findIndex(articleId => articleId.toString() === id.toString())
+
+    if (this.favoritesArticles[idx]) {
+        this.favoritesArticles = this.favoritesArticles.filter(articleId => articleId.toString() !== id.toString())
     }
 
     return this.save()

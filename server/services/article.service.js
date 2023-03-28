@@ -1,6 +1,9 @@
 const Article = require('../models/article.model')
 const AppError = require('../utils/appError')
 const ObjectId = require('mongodb').ObjectId
+const User = require('../models/users.model')
+const AsyncLock = require('async-lock');
+const lock = new AsyncLock();
 
 exports.getAllArticles = async function() {
   try {
@@ -29,6 +32,7 @@ exports.addNewArticle = async function(user, reqBody) {
 
     return newArticle
   } catch(err) {
+    console.log(err);
     throw err
   }
 }
@@ -44,19 +48,10 @@ exports.getArticleById = async function(articleId) {
 
 exports.updateArticle = async function(articleId, reqBody) {
   try {
-    await Article.updateOne(
-      {'_id': articleId},
-      {
-        $set: {
-          title: reqBody.title,
-          quickSummary: reqBody.quickSummary,
-          description: reqBody.description,
-          sourceLink: reqBody.sourceLink,
-        }
-      }
-    )
+    const updatedArticle = await Article.findByIdAndUpdate(articleId, reqBody) 
+    await updatedArticle.save()
 
-    return await Article.findById(articleId)
+    return updatedArticle
   } catch(err) {
     throw err
   }
@@ -67,6 +62,50 @@ exports.deleteArticle = async function(articleId, user) {
     const isDeleted = await Article.deleteOne({ _id: new ObjectId(articleId) })
     await user.removeArticle(articleId)
     return !!isDeleted.deletedCount
+  } catch(err) {
+    throw err
+  }
+}
+
+exports.addArticleToFavorites = async function(articleId, user) {
+  try {
+    await user.addArticleToFavorites(articleId)
+
+    await Article.updateOne(
+      {'_id': articleId},
+      {
+        $inc: { favoritesCount: 1 }
+      }
+    )
+
+    return await Article.findById(articleId)
+  } catch(err) {
+    throw err
+  }
+}
+
+exports.removeArticleFromFavorite = async function(articleId, user) {
+  try {
+    await user.removeArticleFromFavorites(articleId)
+
+    await Article.updateOne(
+      {'_id': articleId},
+      {
+        $inc: { favoritesCount: -1 }
+      }
+    )
+
+    return await Article.findById(articleId)
+  } catch(err) {
+    throw err
+  }
+}
+
+exports.getFavoritesArticles = async function(userId) {
+  try {
+    const { favoritesArticles } = await User.findById(userId).populate('favoritesArticles')
+
+    return { articles: favoritesArticles, articlesCount: favoritesArticles.length }
   } catch(err) {
     throw err
   }

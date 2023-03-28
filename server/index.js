@@ -12,8 +12,10 @@ const mongoose = require('mongoose')
 const passport = require("passport")
 const bodyParser = require('body-parser')
 
+app.use(express.static(__dirname + '/uploads'))
 app.set('trust proxy', 1)
 app.use(express.json());
+app.use(bodyParser.json());
 // app.use(bodyParser.json({ limit: '50mb' }));
 // app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 
@@ -24,6 +26,9 @@ const articleRouter = require('./routes/artiles.router')
 app.use('/api', authRouter)
 app.use('/api', userRouter)
 app.use('/api', articleRouter)
+app.get('/api/server/uploads/:slug', function(req, res){
+  res.sendFile(`${__dirname}/uploads/${req.params.slug}`);
+})
 
 async function start() {
   try {

@@ -44,3 +44,30 @@ exports.deleteArticle = async function(req, res) {
     res.status(err.status || 500).json({success: false, message: err.message})
   }
 }
+
+exports.addArticleToFavorites = async function(req, res) {
+  try {
+    const article = await articleService.addArticleToFavorites(req.params.slug, req.user)
+    res.status(200).json(article)
+  } catch(err) {
+    res.status(err.status || 500).json({success: false, message: err.message})
+  }
+}
+
+exports.removeArticleFromFavorite = async function(req, res) {
+  try {
+    const article = await articleService.removeArticleFromFavorite(req.params.slug, req.user)
+    res.status(200).json(article)
+  } catch(err) {
+    res.status(err.status || 500).json({success: false, message: err.message})
+  }
+}
+
+exports.getFavoritesArticles = async function(req, res) {
+  try {
+    const articles = await articleService.getFavoritesArticles(req.user._id)
+    res.status(200).json(articles)
+  } catch(err) {
+    res.status(err.status || 500).json({success: false, message: err.message})
+  }
+}

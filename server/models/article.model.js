@@ -8,7 +8,8 @@ const article = new Schema({
   },
   title: {
     type: String,
-    require: true
+    require: true,
+    unique: true
   },
   quickSummary: {
     type: String,
@@ -17,6 +18,11 @@ const article = new Schema({
   description: {
     type: String,
     require: true
+  },
+  favoritesCount: {
+    type: Number,
+    require: true,
+    default: 0
   },
   sourceLink: {
     type: String,
