@@ -110,3 +110,13 @@ exports.getFavoritesArticles = async function(userId) {
     throw err
   }
 }
+
+exports.getArticlesByCategory = async function(category) {
+  try {
+    const articles = await Article.find({ categories: category });
+
+    return { articles, articlesCount: articles.length }
+  } catch(err) {
+    throw err
+  }
+}

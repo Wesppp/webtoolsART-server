@@ -7,6 +7,7 @@ const router = express.Router()
 
 router.route("/articles").get(asyncHandler(articleController.getAllArticles))
 router.route("/articles/favorites").get(authenticate, asyncHandler(articleController.getFavoritesArticles))
+router.route("/articles/categories/:slug").get(asyncHandler(articleController.getArticlesByCategory))
 router.route("/articles/:articleId").get(asyncHandler(articleController.getArticleById))
 router.route("/articles/:articleId").put(asyncHandler(articleController.updateArticle))
 router.route("/articles/:articleId").delete(authenticate, asyncHandler(articleController.deleteArticle))

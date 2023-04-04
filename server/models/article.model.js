@@ -27,7 +27,10 @@ const article = new Schema({
   sourceLink: {
     type: String,
     require: true
-  }
+  },
+  categories: [{
+    type: String
+  }]
 }, {timestamps: true})
 
 module.exports = model('Article', article)

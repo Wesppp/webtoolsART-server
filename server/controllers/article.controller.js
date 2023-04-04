@@ -71,3 +71,12 @@ exports.getFavoritesArticles = async function(req, res) {
     res.status(err.status || 500).json({success: false, message: err.message})
   }
 }
+
+exports.getArticlesByCategory = async function(req, res) {
+  try {
+    const articles = await articleService.getArticlesByCategory(req.params.slug)
+    res.status(200).json(articles)
+  } catch(err) {
+    res.status(err.status || 500).json({success: false, message: err.message})
+  }
+}

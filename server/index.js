@@ -22,10 +22,12 @@ app.use(bodyParser.json());
 const authRouter = require('./routes/auth.route')
 const userRouter = require('./routes/user.route')
 const articleRouter = require('./routes/artiles.router')
+const categoryRouter = require('./routes/categories.route')
 
 app.use('/api', authRouter)
 app.use('/api', userRouter)
 app.use('/api', articleRouter)
+app.use('/api', categoryRouter)
 app.get('/api/server/uploads/:slug', function(req, res){
   res.sendFile(`${__dirname}/uploads/${req.params.slug}`);
 })
