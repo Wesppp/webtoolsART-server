@@ -60,7 +60,10 @@ exports.updateArticle = async function(articleId, reqBody) {
 exports.deleteArticle = async function(articleId, user) {
   try {
     const isDeleted = await Article.deleteOne({ _id: new ObjectId(articleId) })
+    
     await user.removeArticle(articleId)
+    await User.updateMany({ favoritesArticles: articleId }, { $pull: { favoritesArticles: articleId } })
+
     return !!isDeleted.deletedCount
   } catch(err) {
     throw err
