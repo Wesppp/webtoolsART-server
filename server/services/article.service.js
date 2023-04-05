@@ -2,14 +2,20 @@ const Article = require('../models/article.model')
 const AppError = require('../utils/appError')
 const ObjectId = require('mongodb').ObjectId
 const User = require('../models/users.model')
-const AsyncLock = require('async-lock');
-const lock = new AsyncLock();
 
-exports.getAllArticles = async function() {
+exports.getAllArticles = async function(query) {
   try {
-    const articles = await Article.find().populate('author')
+    const { pageNumber = 1, pageSize = 10 } = query
+
+    const options = {
+      page: pageNumber,
+      limit: pageSize,
+      populate: 'author',
+    }
+
+    const { docs } = await Article.paginate({}, options);
     const articlesCount = await Article.count()
-    return { articles, articlesCount }
+    return { articles: docs, articlesCount }
   } catch(err) {
     throw err
   }
@@ -104,21 +110,38 @@ exports.removeArticleFromFavorite = async function(articleId, user) {
   }
 }
 
-exports.getFavoritesArticles = async function(userId) {
+exports.getFavoritesArticles = async function(userId, query) {
   try {
-    const { favoritesArticles } = await User.findById(userId).populate('favoritesArticles')
+    const { pageNumber = 1, pageSize = 10 } = query
 
-    return { articles: favoritesArticles, articlesCount: favoritesArticles.length }
+    const options = {
+      page: pageNumber,
+      limit: pageSize,
+      populate: 'author',
+    }
+
+    const { favoritesArticles } = await User.findById(userId).populate('favoritesArticles');
+    const articles = await Article.paginate({ _id: { $in: favoritesArticles } }, options);
+
+    return { articles: articles.docs, articlesCount: articles.totalDocs };
   } catch(err) {
     throw err
   }
 }
 
-exports.getArticlesByCategory = async function(category) {
+exports.getArticlesByCategory = async function(category, query) {
   try {
-    const articles = await Article.find({ categories: category });
+    const { pageNumber = 1, pageSize = 10 } = query
 
-    return { articles, articlesCount: articles.length }
+    const options = {
+      page: pageNumber,
+      limit: pageSize,
+      populate: 'author',
+    }
+
+    const articles = await Article.paginate({ categories: category }, options);
+
+    return { articles: articles.docs, articlesCount: articles.totalDocs };
   } catch(err) {
     throw err
   }

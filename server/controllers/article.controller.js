@@ -2,7 +2,7 @@ const articleService = require('../services/article.service')
 
 exports.getAllArticles = async function(req, res) {
   try {
-    const articles = await articleService.getAllArticles()
+    const articles = await articleService.getAllArticles(req.query)
     res.status(200).json(articles)
   } catch(err) {
     res.status(err.status || 500).json({success: false, message: err.message})
@@ -65,7 +65,7 @@ exports.removeArticleFromFavorite = async function(req, res) {
 
 exports.getFavoritesArticles = async function(req, res) {
   try {
-    const articles = await articleService.getFavoritesArticles(req.user._id)
+    const articles = await articleService.getFavoritesArticles(req.user._id, req.query)
     res.status(200).json(articles)
   } catch(err) {
     res.status(err.status || 500).json({success: false, message: err.message})
@@ -74,7 +74,7 @@ exports.getFavoritesArticles = async function(req, res) {
 
 exports.getArticlesByCategory = async function(req, res) {
   try {
-    const articles = await articleService.getArticlesByCategory(req.params.slug)
+    const articles = await articleService.getArticlesByCategory(req.params.slug, req.query)
     res.status(200).json(articles)
   } catch(err) {
     res.status(err.status || 500).json({success: false, message: err.message})
