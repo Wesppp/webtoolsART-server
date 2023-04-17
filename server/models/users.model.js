@@ -36,6 +36,11 @@ const user = new Schema({
         type: String,
         required: false
     },
+    role: {
+        type: String,
+        required: false,
+        default: 'user'
+    },
     phone: {
         type: String,
         required: false,

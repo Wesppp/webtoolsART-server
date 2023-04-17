@@ -31,9 +31,21 @@ const article = new Schema({
   },
   categories: [{
     type: String
-  }]
+  }],
+  comments: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Comment',
+      required: false
+    }
+  ],
 }, {timestamps: true})
 
 article.plugin(mongoosePaginate)
+
+article.methods.addComment = function(id) {
+  this.comments.push(id)
+  return this.save()
+}
 
 module.exports = model('Article', article)

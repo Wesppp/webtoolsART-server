@@ -23,11 +23,13 @@ const authRouter = require('./routes/auth.route')
 const userRouter = require('./routes/user.route')
 const articleRouter = require('./routes/artiles.router')
 const categoryRouter = require('./routes/categories.route')
+const commentsRouter = require('./routes/comment.route')
 
 app.use('/api', authRouter)
 app.use('/api', userRouter)
 app.use('/api', articleRouter)
 app.use('/api', categoryRouter)
+app.use('/api', commentsRouter)
 app.get('/api/server/uploads/:slug', function(req, res){
   res.sendFile(`${__dirname}/uploads/${req.params.slug}`);
 })

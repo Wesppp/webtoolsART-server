@@ -2,6 +2,7 @@ const Article = require('../models/article.model')
 const AppError = require('../utils/appError')
 const ObjectId = require('mongodb').ObjectId
 const User = require('../models/users.model')
+const Comment = require('../models/comment.model')
 
 exports.getAllArticles = async function(query) {
   try {
@@ -65,6 +66,10 @@ exports.updateArticle = async function(articleId, reqBody) {
 
 exports.deleteArticle = async function(articleId, user) {
   try {
+    const article = await Article.findById(articleId)
+
+    await Comment.deleteMany({ _id: { $in: article.comments } })
+
     const isDeleted = await Article.deleteOne({ _id: new ObjectId(articleId) })
     
     await user.removeArticle(articleId)
