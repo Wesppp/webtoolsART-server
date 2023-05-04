@@ -41,6 +41,10 @@ const user = new Schema({
         required: false,
         default: 'user'
     },
+    isConfirmed: {
+        type: Boolean,
+        default: false
+    },
     phone: {
         type: String,
         required: false,
@@ -67,6 +71,12 @@ const user = new Schema({
         }
     ]
 }, {timestamps: true})
+
+user.methods.generateConfirmationToken = function() {
+    const payload = { userId: this._id }
+
+    return jwt.sign(payload, JWT_SECRET)
+}
 
 user.methods.addArticle = function(id) {
     this.articles.push(id)

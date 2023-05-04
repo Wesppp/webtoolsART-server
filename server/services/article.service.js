@@ -56,10 +56,12 @@ exports.getArticleById = async function(articleId) {
 exports.updateArticle = async function(articleId, reqBody) {
   try {
     const updatedArticle = await Article.findByIdAndUpdate(articleId, reqBody) 
-    await updatedArticle.save()
-
     return updatedArticle
   } catch(err) {
+    if (err.code === 11000 && err.keyPattern.title) {
+      err.message = 'An article with this title already exists!';
+    }
+
     throw err
   }
 }

@@ -5,9 +5,7 @@ const fs = require("fs");
 exports.getUserById = async function(userId) {
   try {
     const user = await User.findById(userId)
-
-    await user.save()
-
+    
     if (!user) { throw new AppError('No such user was found.', 400) }
 
     return { user, articlesCount: user.articles.length }
@@ -29,11 +27,14 @@ exports.getUserArticles = async function(userId) {
 exports.updateUser = async function(userId, reqBody) {
   try {
     const updatedUser = await User.findByIdAndUpdate(userId, reqBody)
-    await updatedUser.save()
-
     return updatedUser
   } catch(err) {
-    throw(err)
+    if (err.code === 11000 && err.keyPattern.username) {
+      err.message = 'This username is already used!';
+    } else if (err.code === 11000 && err.keyPattern.email) {
+      err.message = 'This email is already used!';
+    }
+    throw err
   }
 }
 

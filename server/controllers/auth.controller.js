@@ -17,3 +17,12 @@ exports.login = async function(req, res) {
     res.status(err.status || 500).json({success: false, message: err.message})
   }
 }
+
+exports.confirmation = async function(req, res) {
+  try {
+    await authService.confirmation(req.params.token)
+    res.redirect('http://localhost:4200/login')
+  } catch(err) {
+    res.status(err.status || 500).json({success: false, message: err.message})
+  }
+}
