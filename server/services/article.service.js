@@ -1,5 +1,4 @@
 const Article = require('../models/article.model')
-const AppError = require('../utils/appError')
 const ObjectId = require('mongodb').ObjectId
 const User = require('../models/users.model')
 const Comment = require('../models/comment.model')
@@ -25,10 +24,6 @@ exports.getAllArticles = async function(query) {
 exports.addNewArticle = async function(user, reqBody) {
   try {
     const { _id: userId } = user
-    const isExistingArticleTitle = !!await Article.findOne({title: reqBody.title})
-
-    if(isExistingArticleTitle) { throw new AppError('An article with this title already exists.', 400) }
-
     reqBody.author = userId
 
     const newArticle = new Article(reqBody)
@@ -39,15 +34,17 @@ exports.addNewArticle = async function(user, reqBody) {
 
     return newArticle
   } catch(err) {
-    console.log(err);
+    if (err.code === 11000 && err.keyPattern.title) {
+      err.message = 'An article with this title already exists!';
+    }
+
     throw err
   }
 }
 
 exports.getArticleById = async function(articleId) {
   try {
-    const article = await Article.findById(articleId).populate('author')
-    return article
+    return await Article.findById(articleId).populate('author')
   } catch(err) {
     throw err
   }
@@ -55,8 +52,7 @@ exports.getArticleById = async function(articleId) {
 
 exports.updateArticle = async function(articleId, reqBody) {
   try {
-    const updatedArticle = await Article.findByIdAndUpdate(articleId, reqBody) 
-    return updatedArticle
+    return await Article.findByIdAndUpdate(articleId, reqBody)
   } catch(err) {
     if (err.code === 11000 && err.keyPattern.title) {
       err.message = 'An article with this title already exists!';
